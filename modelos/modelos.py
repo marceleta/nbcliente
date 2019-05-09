@@ -9,20 +9,6 @@ class BaseModel(Model):
     class Meta:
         database = db
 
-class Controle(BaseModel):
-
-    ultimo_envio_bkp = DateTimeField()
-
-    def busca_por_data(self, data):
-
-        ctrl = None
-        try:
-            controle = Controle.get(Controle.envio_bkp_list=data)
-        except DoesNotExist:
-            ctrl = None
-
-        return ctrl
-
 class Servidor(BaseModel):
 
     nome = CharField(max_length=40)
@@ -55,7 +41,7 @@ class Backup(BaseModel):
     sc_pre_execucao = CharField()
     sc_pos_execucao = CharField()
 
-    servidor = ForeignField(Servidor, backref='servidor')
+    servidor = ForeignKeyField(Servidor, backref='backups')
 
     def dict_backup(self):
         bkp = {
