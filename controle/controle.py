@@ -1,6 +1,7 @@
 from peewee import *
 import datetime
 from configuracao.config import Configuracao
+from comunicacao.nbservidor import Conexao
 from modelos.modelos import Controle
 from util.util import DataConv
 
@@ -37,10 +38,17 @@ class ControleApp:
             print('comando nao encontrado')
 
     def _atualizar_lst_bkps(self, data_json):
-        self._config.salvar_servidores()
-        self._resposta = 'ok'
 
-    def _converter_para_classe(self, )
+        if self._config.salvar_servidores(data_json):
+                self._resposta = 'ok'
+        else:
+            self._resposta = 'erro:Salvar_Arquivo'
+
+    def _enviar_mensage_serv(self, mensagem, servidor):
+        conexao_serv = Conexao(servidor.host, servidor.porta)
+        
+
+
 
     def enviar_resposta(self):
         return self._resposta.encode('utf-8')

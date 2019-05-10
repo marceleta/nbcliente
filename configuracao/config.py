@@ -1,4 +1,5 @@
 from backup.backup import Backup
+from json_modelos.modelos import Servidor
 import platform
 import json
 
@@ -7,28 +8,35 @@ class Configuracao:
 
     def __init__(self):
         self.config_path()
-        #self._verificar_banco()
+        self._set_servidores()
 
-    '''
-    def _set_backup(self):
 
-        path_backup = self._path + 'backup/backup_list.json'
-        with open(path_backup) as backup_json:
-            data = json.load(backup_json)
-            b = data['backup']
-            self._backup_list = []
-            for i in b:
-                self._backup = Backup(i)
-                self._backup_list.append(self._backup)
-    '''
+    def _set_servidores(self):
+        path = self.config_path() + 'json_modelos/servidores.json'
+        self._lista_servidores = []
+        try:
+            arquivo = open(path, 'r')
+            servidores = json.loads(arquivo)
+            keys = servidores.keys()
+            for k in keys:
+                dict_server = servidores[k]
+                serv = Servidor(dict_server)
+                self._lista_servidores.append(serv)
+        except FileNotFound:
+            self._lista_servidores = None
+
+        return self._lista_servidores
+
+
 
     def salvar_servidores(self, servidores):
         resposta = False
         path = config_path() + '/json_modelos/servidores.json'
 
         try:
-            arquivo = open(path,'w')
+            arquivo = open(path, 'w')
             arquivo.write(servidores)
+            arquivo.close()
             resposta = True
         except FileNotFound:
             resposta = False
@@ -43,9 +51,14 @@ class Configuracao:
         else:
             self._path = '/home/marcelo/python/nbcliente/'
 
+        return self._path
+
     @staticmethod
     def os_system():
         return platform.system()
+
+    def get_servidores(self):
+        return self._lista_servidores
 '''
     def _verificar_banco(self):
 
