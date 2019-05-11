@@ -15,6 +15,12 @@ class Conversor:
 
         return dict
 
+    @staticmethod
+    def json_backups(servidor):
+
+        for bkps in servidor.backups:
+            pass
+
 class Servidor:
 
     def __init__(self, dict):

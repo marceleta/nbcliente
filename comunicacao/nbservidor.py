@@ -6,19 +6,34 @@ from threading import Thread
 
 class ConexaoThread(Thread):
 
-    def __init__(self, host, porta, mensagem, nome_thread=None):
-        Thread.__init__(self, name=nome_thread)
-        self._conexao = Conexao(host, porta, mensagem)
+    def __init__(self, servidor, mensagem):
+        Thread.__init__(self, name=servidor.nome)
+        self._servidor = servidor
+        self._conexao = Conexao(servidor.host, servidor.porta, mensagem)
         self._resposta = None
 
     def run(self):
         if self._conexao.is_conectado():
             self._conexao.enviar_mensagem()
-            self._resposta = self._conexao.receber_mensagem()
+            self._processar_mensagem(self._conexao.receber_mensagem())
+            #self._mensagem = self._conexao.receber_mensagem()
             self._conexao.fechar_conexao()
 
-    def get_mensagem(self):
+    def _processar_mensagem(self, mensagem):
+        self._resposta = mensagem['resposta']
+        del mensagem['resposta']
+        self._conteudo = mensagem
+
+
+    def get_resposta(self):
         return self._resposta
+
+    def get_conteudo(self):
+        return self._conteudo
+
+    def get_servidor(self):
+        return self._servidor
+
 
 
 class Conexao:

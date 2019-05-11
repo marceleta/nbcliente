@@ -1,6 +1,6 @@
 from backup.backup import Backup
 from json_modelos.modelos import Servidor
-import platform
+import platform, os
 import json
 
 
@@ -14,6 +14,21 @@ class Configuracao:
     def _set_servidores(self):
         path = self.config_path() + 'json_modelos/servidores.json'
         self._lista_servidores = []
+        if os.path.exists(path):
+            arquivo = open(path, 'r')
+            servidores = json.load(arquivo)
+            keys = servidores.keys()
+            for k in keys:
+                dict_server = servidores[k]
+                serv = Servidor(dict_server)
+                self._lista_servidores.append(serv)
+
+        else:
+            self._lista_servidores = None
+
+        return self._lista_servidores
+
+        '''
         try:
             arquivo = open(path, 'r')
             servidores = json.loads(arquivo)
@@ -24,10 +39,7 @@ class Configuracao:
                 self._lista_servidores.append(serv)
         except FileNotFound:
             self._lista_servidores = None
-
-        return self._lista_servidores
-
-
+        '''
 
     def salvar_servidores(self, servidores):
         resposta = False
@@ -44,9 +56,9 @@ class Configuracao:
         return resposta
 
 
-    @staticmethod
-    def config_path():
-        if self.os_system() == 'Windows':
+
+    def config_path(self):
+        if platform.system() == 'Windows':
             self._path = 'c:/nbcliente/'
         else:
             self._path = '/home/marcelo/python/nbcliente/'
