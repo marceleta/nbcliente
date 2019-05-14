@@ -56,7 +56,7 @@ class Conexao:
         return resposta
 
     def enviar_mensagem(self):
-        msg_encode =  self._mensagem.encode()
+        msg_encode =  self._mensagem.encode('utf-8')
         self._client_socket.sendall(msg_encode)
 
     def receber_mensagem(self):

@@ -6,6 +6,7 @@ from configuracao.config import Configuracao
 from comunicacao.nbservidor import ConexaoThread
 from db.modelos import Persistir
 from util.util import DataConv
+from servico.servico import Download_ftp
 
 class ControleApp:
 
@@ -17,6 +18,7 @@ class ControleApp:
         self._loop_controle = True
         self._thread_conexao_servidores = {}
         self._thread_controle = {}
+        self._lista_servico_ftp = {}
 
 
     def iniciar_threads(self):
@@ -26,6 +28,11 @@ class ControleApp:
         verf_conex_serv = Thread(target=self._monitor_conexao_servidores, name=self._verificacao_servidores)
         verf_conex_serv.start()
         self._thread_controle[self._verificacao_servidores] = verf_conex_serv
+
+        self._verifica_bkps_prontos = 'verifica_bkps_prontos'
+        verifica_bkps_prontos = Thread(target=self._verificar_bkps_prontos, name=self._verifica_bkps_prontos)
+        verifica_bkps_prontos.start()
+        self._thread_controle[self._verifica_bkps_prontos] = verifica_bkps_prontos
 
     def set_data(self, data):
         self._data = data
@@ -66,8 +73,11 @@ class ControleApp:
         for key in keys:
             str_servidor = data_json[key]
             servidor = Servidor(str_servidor)
-            mensagem = {'comando':'update_lst_bkp'}
-            mensagem['backup'] = servidor.backups
+            mensagem = {
+            'comando':'update_lst_bkp'
+            'backups':servidor.backups
+            }
+
             self._enviar_mensagem_servidor(servidor, mensagem)
 
 
@@ -85,19 +95,16 @@ class ControleApp:
                 if tratamento.is_execucao():
                     mensagem = {'comando':'list_bkps_prontos'}
                     self._enviar_mensagem_servidor(servidor, mensagem)
+
             time.sleep(60)
 
-
-
-
     def _monitor_conexao_servidores(self):
-        while True:
+        while self._loop_controle:
             lista_conexoes = self._thread_conexao_servidores.keys()
             for key in lista_conexoes:
                 thread = self._thread_conexao_servidores[key]
                 if not thread.is_alive():
-                    resposta = thread.get_resposta()
-                    self._tratamento_resposta(resposta, thread.get_conteudo())
+                    self._tratamento_resposta(thread.get_resposta(), thread.get_conteudo(), thread.get_servidor())
                     del self._thread_conexao_servidores[key]
 
             time.sleep(60)
@@ -107,9 +114,20 @@ class ControleApp:
         if resposta == 'ok':
             Persistir.config_enviadas(servidor.nome, resposta)
         elif resposta == 'lst_bkps_prontos':
-            self._executar_download_bkps(servidor,conteudo)
+            self._abertura_ftp_servidor(servidor, conteudo)
 
-    
+
+    def _abertura_ftp_servidor(self, servidor, conteudo):
+        arquivos = conteudo['arquivos']
+        comando = {'comando':'iniciar_ftp'}
+        for arquivo in arquivos:
+            comando[arquivo['backup']] = ['path':arquivo['path'], 'nome':arquivo['nome']]
+
+        resposta = json.dumps(comando)
+        self._enviar_mensagem_servidor(servidor, resposta)
+
+
+
     def _byte_to_json(self):
 
         return json.loads(self._data.decode('utf-8'))
