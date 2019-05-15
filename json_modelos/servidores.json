@@ -2,8 +2,15 @@
     "servidor1":{
         "nome":"servidor1",
         "descricao": "descricao1",
-        "host":"host",
+        "host":"localhost",
         "porta":"5000",
+        "ftp":
+            {
+                "usuario":"marcelo",
+                "senha":"12345",
+                "host":"localhost",
+                "porta":"5001"
+            },
         "backups":[
             {
                 "nome":"backup_1",
@@ -38,8 +45,15 @@
     "servidor2":{
         "nome":"servidor2",
         "descricao":"descricao2",
-        "host":"host",
-        "porta":"porta",
+        "host":"localhost",
+        "porta":"5000",
+        "ftp":
+            {
+                "usuario":"marcelo",
+                "senha":"12345",
+                "host":"localhost",
+                "porta":"5001"
+            },
         "backups":[
             {
                 "nome":"backup_1",

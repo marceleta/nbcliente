@@ -9,6 +9,7 @@ class Configuracao:
     def __init__(self):
         self.config_path()
         self._set_servidores()
+        self._set_backup_dir()
 
 
     def _set_servidores(self):
@@ -26,7 +27,11 @@ class Configuracao:
         else:
             self._lista_servidores = None
 
-        return self._lista_servidores
+
+        def _set_backup_dir(self):
+            path = self.config_path() +'/configuracao/backup_dir.py'
+            with open(path) as dir:
+                self._backup_dir = json.load(backup_dir)
 
         '''
         try:
@@ -71,6 +76,12 @@ class Configuracao:
 
     def get_servidores(self):
         return self._lista_servidores
+
+    def get_backup_dir(self):
+        return self._backup_dir
+
+    def get_backup_dir_path(self, nome_servidor):
+        return self.get_backup_dir[nome_servidor]
 '''
     def _verificar_banco(self):
 

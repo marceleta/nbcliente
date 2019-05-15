@@ -16,7 +16,6 @@ class ConexaoThread(Thread):
         if self._conexao.is_conectado():
             self._conexao.enviar_mensagem()
             self._processar_mensagem(self._conexao.receber_mensagem())
-            #self._mensagem = self._conexao.receber_mensagem()
             self._conexao.fechar_conexao()
 
     def _processar_mensagem(self, mensagem):

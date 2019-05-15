@@ -18,7 +18,6 @@ class ControleApp:
         self._loop_controle = True
         self._thread_conexao_servidores = {}
         self._thread_controle = {}
-        self._lista_servico_ftp = {}
 
 
     def iniciar_threads(self):
@@ -118,12 +117,7 @@ class ControleApp:
 
 
     def _abertura_ftp_servidor(self, servidor, conteudo):
-        arquivos = conteudo['arquivos']
-        comando = {'comando':'iniciar_ftp'}
-        for arquivo in arquivos:
-            comando[arquivo['backup']] = ['path':arquivo['path'], 'nome':arquivo['nome']]
 
-        resposta = json.dumps(comando)
         self._enviar_mensagem_servidor(servidor, resposta)
 
 

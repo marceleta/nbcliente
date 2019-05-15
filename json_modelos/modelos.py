@@ -77,15 +77,63 @@ class Servidor:
     def backups(self, backups):
         self._dict[self.nome]['backup'] = backups
 
+    @property
+    def ftp(self):
+        return self._dict['ftp']
+
+    @property
+    def obj_ftp(self):
+        ftp = Ftp(self._dict['ftp'])
+
+        return ftp
+
     def get_dict(self):
         d = {
             'nome':self.nome,
             'descricao':self.descricao,
             'host':self.host,
             'porta':str(self.porta),
+            'ftp':self.ftp,
             'backups':self.backups
         }
         return d
+
+class Ftp:
+
+    def __init__(self, dict):
+        self._dict = dict
+
+    @property
+    def usuario(self):
+        return self._dict['usuario']
+
+    @usuario.setter
+    def usuario(self, valor):
+        self._dict['usuario'] = valor
+
+    @property
+    def senha(self):
+        return self._dict['senha']
+
+    @senha.setter
+    def senha(self, valor):
+        self._dict['senha'] = valor
+
+    @property
+    def host(self):
+        return self._dict['host']
+
+    @host.setter
+    def host(self, valor):
+        return self._dict['host'] = valor
+
+    @property
+    def porta(self):
+        return self._dict['porta']
+
+    @porta.setter
+    def porta(self, valor):
+        self._dict['porta'] = valor
 
 class Backup:
 
