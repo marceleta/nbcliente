@@ -6,7 +6,7 @@ from configuracao.config import Configuracao
 from comunicacao.nbservidor import ConexaoThread
 from db.modelos import Persistir
 from util.util import DataConv
-from servico.servico import Download_ftp
+from servico.servico import Gestao_download
 
 class ControleApp:
 
@@ -15,6 +15,7 @@ class ControleApp:
 
     def __init__(self):
         self._config = Configuracao()
+        self._gestao_d = Gestao_download()
         self._loop_controle = True
         self._thread_conexao_servidores = {}
         self._thread_controle = {}
@@ -32,6 +33,11 @@ class ControleApp:
         verifica_bkps_prontos = Thread(target=self._verificar_bkps_prontos, name=self._verifica_bkps_prontos)
         verifica_bkps_prontos.start()
         self._thread_controle[self._verifica_bkps_prontos] = verifica_bkps_prontos
+
+        self._verifica_download_concluido = 'monitor_bkps_finalizados'
+        monitor_download_concluido = Thread(target=self._monitor_download_concluido, name=self._verifica_download_concluido)
+        monitor_download_concluido.start()
+        self._thread_controle[self._verifica_download_concluido] = monitor_download_concluido
 
     def set_data(self, data):
         self._data = data
@@ -114,13 +120,23 @@ class ControleApp:
             Persistir.config_enviadas(servidor.nome, resposta)
         elif resposta == 'lst_bkps_prontos':
             self._abertura_ftp_servidor(servidor, conteudo)
-
+        elif resposta == 'salvar_bkps_ok':
+            Persistir.config_enviadas(servidor.nome, resposta)
+        elif resposta == 'ftp_pronto_download':
+            self._gestao_d.executa_download(resposta)
 
     def _abertura_ftp_servidor(self, servidor, conteudo):
-
+        self._gestao_d.adicionar(servidor, conteudo)
+        resposta = self._gestao_d.get_msg_em_espera()
         self._enviar_mensagem_servidor(servidor, resposta)
 
+    def _monitor_download_concluido(self):
 
+        while self._loop_controle:
+            for mensagem in self._gestao_d.get_msg_finalizados():
+                self._enviar_mensagem_servidor(mensagem['servidor'], mensagem['comando'])
+
+            time.sleep(60)
 
     def _byte_to_json(self):
 

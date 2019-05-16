@@ -8,20 +8,17 @@ class Gestao_download:
     def __init__(self):
         self._loop_gestao = True
         self._thread_gestao = []
-        self._download_em_espera = []
+        self._download_em_espera = {}
         self._download_em_andamento = []
         self._download_finalizados = []
         self._iniciar_servicos()
 
-
-
     def adicionar(self, servidor, arquivos):
-        keys = arquivos.keys()
-        for key in keys:
-            nome = servidor.nome + '_' + arquivo['nome']
-            download_ftp = Download_ftp(arquivos[key], servidor)
-            thread = Download_thread(download_ftp, nome)
-            self._download_em_espera.append(thread)
+        lista_arquivos = arquivos['arquivos']
+        for arquivo in lista_arquivos:
+            download_ftp = Download_ftp(arquivo, servidor)
+            thread = Download_thread(download_ftp, arquivo['backup'])
+            self._download_em_espera[arquivo['backup']] = thread
 
     def _monitor_downloads_executando(self):
         '''
@@ -37,14 +34,10 @@ class Gestao_download:
 
             time.sleep(60)
 
-    def _executa_download_espera(self):
-        while self._loop_gestao:
-            if self._numero_execucoes < 2 and len(self._download_em_espera) > 0:
-                thread = self._download_em_espera.pop()
-                self._download_em_andamento.append(thread)
-                thread.start()
-
-            time.sleep(60)
+    def executa_download(self, nome_backup):
+        thread = self._download_em_espera[nome_backup]
+        thread.start()
+        self._download_em_andamento.append(thread)
 
     def _remove_download_finalizado(self):
         while self._loop_gestao:
@@ -70,8 +63,30 @@ class Gestao_download:
         self._thread_gestao.append(monitor_finalizado)
 
 
-    def get_download_finalizados(self):
-        return self._download_finalizados
+    def get_msg_em_espera(self):
+        lista_espera  = []
+        contador = 0
+        keys = list(self._download_em_espera.keys())
+        while len(self._download_em_andamento) < 2 and len(lista_espera) < 2:
+            thread = self._download_em_espera[keys[contador]]
+            lista_espera.append(thread.get_download_ftp().msg_abrir_ftp())
+            contador += 1
+
+        return lista_espera
+
+
+    def get_msg_finalizados(self):
+        lista_msg = []
+
+        for thread in self._download_finalizados:
+            config_ftp = thread.get_download_ftp()
+            mensagem = {
+                'servidor':config_ftp.get_servidor(),
+                'comando':config.msg_fechar_ftp()
+            }
+            lista_msg.append(mensagem)
+
+        return lista_msg
 
     def is_executando(self):
         return self._loop_gestao
@@ -100,9 +115,6 @@ class Download_thread(Thread):
     def get_download_ftp(self):
         return self._download_ftp
 
-
-
-
 class Download_ftp:
 
     def __init__(self, arquivo, servidor):
@@ -116,12 +128,19 @@ class Download_ftp:
         self._config_ftp()
 
 
-    def msg_ftp_servidor(self):
+    def msg_abrir_ftp(self):
         '''
         Mensagem para enviar ao servidor para abrir FTP
         '''
         comando = {'comando':'iniciar_ftp'}
         comando[self._arquivo['backup']] = ['path':self._arquivo['path'], 'nome':self._arquivo['nome']]
+
+        return json.dumps(comando)
+
+    def msg_fechar_ftp(self):
+
+        comando = {'comando':'fechar_ftp'}
+        comando['nome'] = self._arquivo['backup']
 
         return json.dumps(comando)
 
