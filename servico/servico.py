@@ -141,12 +141,6 @@ class Download_ftp:
                         'nome':self._arquivo['backup']
                     }
         }
-        #comando[self._arquivo['backup']] = {
-        #                        'path':self._arquivo['path'],
-        #                        'nome':self._arquivo['nome']
-        #                        }
-
-
         return comando
 
     def msg_fechar_ftp(self):
@@ -154,7 +148,7 @@ class Download_ftp:
         comando = {'comando':'fechar_ftp'}
         comando['nome'] = self._arquivo['backup']
 
-        return json.dumps(comando)
+        return comando
 
 
     def iniciar(self):
@@ -171,7 +165,6 @@ class Download_ftp:
             self._ftp.login(user=self._config_servidor.usuario, passwd=self._config_servidor.senha)
             resposta = self._ftp.retrlines('LIST')
             print(resposta)
-            #path_destino = self._config.get_backup_dir(self._config_servidor.name) + '/' + self._arquivo['arquivo']
             destino = self._path_destino + '/' + self._arquivo['arquivo']
             self._ftp.retrbinary("RETR "+self._arquivo['arquivo'], open(destino, 'wb').write)
 
