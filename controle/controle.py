@@ -1,6 +1,7 @@
 #! -*- coding: utf-8 -*-
 from peewee import *
 import datetime
+import time
 from threading import Thread
 from configuracao.config import Configuracao
 from comunicacao.nbservidor import ConexaoThread
@@ -19,9 +20,10 @@ class ControleApp:
         self._loop_controle = True
         self._thread_conexao_servidores = {}
         self._thread_controle = {}
+        self._iniciar_threads()
 
 
-    def iniciar_threads(self):
+    def _iniciar_threads(self):
         self._loop_controle = True
 
         self._verificacao_servidores = 'verificacao_servidores'
@@ -79,7 +81,7 @@ class ControleApp:
             str_servidor = data_json[key]
             servidor = Servidor(str_servidor)
             mensagem = {
-            'comando':'update_lst_bkp'
+            'comando':'update_lst_bkp',
             'backups':servidor.backups
             }
 
@@ -95,21 +97,33 @@ class ControleApp:
     def _verificar_bkps_prontos(self):
         lista_servidores = self._config.get_servidores()
         while self._loop_controle:
+            print('lista_servidores: {}'.format(lista_servidores))
             for servidor in lista_servidores:
                 tratamento = Tratamento_Servidor(servidor)
+                print('servidor: {} is_execucao: {}'.format(servidor.nome, tratamento.is_execucao()))
                 if tratamento.is_execucao():
                     mensagem = {'comando':'list_bkps_prontos'}
+                    print('enviar_mensagem')
                     self._enviar_mensagem_servidor(servidor, mensagem)
 
             time.sleep(60)
 
     def _monitor_conexao_servidores(self):
         while self._loop_controle:
-            lista_conexoes = self._thread_conexao_servidores.keys()
+            lista_conexoes = list(self._thread_conexao_servidores.keys())
+            print('lista_conexoes: {}'.format(lista_conexoes))
             for key in lista_conexoes:
                 thread = self._thread_conexao_servidores[key]
+                print('servidor: {}'.format(key))
+                print('thread.is_alive() {}'.format(thread.is_alive()))
                 if not thread.is_alive():
-                    self._tratamento_resposta(thread.get_resposta(), thread.get_conteudo(), thread.get_servidor())
+                    print('thread.is_alive(): {}'.format(thread.is_alive()))
+                    print('thread.is_comunicacao(): {}'.format(thread.is_comunicacao()))
+                    if thread.is_comunicacao():
+                        self._tratamento_resposta(thread.get_resposta(), thread.get_conteudo(), thread.get_servidor())
+                        print('registrar comunicacao bem sucedida')
+                    else:
+                        print('registrar erro comunicacao')
                     del self._thread_conexao_servidores[key]
 
             time.sleep(60)
@@ -127,8 +141,10 @@ class ControleApp:
 
     def _abertura_ftp_servidor(self, servidor, conteudo):
         self._gestao_d.adicionar(servidor, conteudo)
-        resposta = self._gestao_d.get_msg_em_espera()
-        self._enviar_mensagem_servidor(servidor, resposta)
+        lista_resposta = self._gestao_d.get_msg_em_espera()
+        for resposta in lista_resposta:
+            print('abertuta_ftp_servidor:resposta: {}'.format(resposta))
+            self._enviar_mensagem_servidor(servidor, resposta)
 
     def _monitor_download_concluido(self):
 
@@ -162,23 +178,29 @@ class Tratamento_Servidor:
 
 
     def _selecionar_tratamento(self):
+        lista_bkps = self._servidor.obj_backups
 
-        if servidor.periodo == 'diario':
-            self._execucao_diaria()
-        elif servidor.periodo == 'semanal':
-            self._execucao_semanal()
+        for backups in lista_bkps:
+            if backups.periodo == 'diario':
+                print('diario')
+                self._execucao_diaria(backups)
+            elif backups.periodo == 'semanal':
+                print('semanal')
+                self._execucao_semanal(backups)
 
-    def _execucao_diaria(self):
-        if _is_hora_execucao():
+
+    def _execucao_diaria(self, backups):
+        if self._is_hora_execucao(backups):
             self._is_execucao = True
 
-    def _execucao_semanal(self):
-        if servidor.dia_semana == DataConv.hoje_dia_semana() and self._is_hora_execucao():
+    def _execucao_semanal(self, backups):
+        if backups.dia_semana == DataConv.hoje_dia_semana() and self._is_hora_execucao(backups):
             self._is_execucao = True
 
-
-    def is_execucao():
+    def is_execucao(self):
         return self._is_execucao
 
-    def _is_hora_execucao(self):
-        return DataConv.str_to_time(servidor.hora_execucao) >= DataConv.hora_agora()
+    def _is_hora_execucao(self, backups):
+        print('str_to_time: {}'.format(DataConv.str_to_time(backups.hora_execucao)))
+        print('DataConv.hora_agora() {}'.format(DataConv.hora_agora()))
+        return DataConv.hora_agora() >= DataConv.str_to_time(backups.hora_execucao)

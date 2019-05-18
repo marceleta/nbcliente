@@ -1,0 +1,7 @@
+{
+    "servidor_local":{
+        "host":"127.0.0.1",
+        "porta":"5001",
+        "qtd_conexoes":"5"
+    }
+}

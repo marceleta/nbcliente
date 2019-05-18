@@ -3,7 +3,7 @@ import selectors
 import logging
 import time
 import threading
-from controle import controle
+from controle.controle import ControleApp
 import sys
 #filename='nbackup.log', filemode='a',
 #logging.basicConfig(filename='nbackup.log', filemode='a',level=logging.INFO, format='[%(asctime)s %(message)s]')
@@ -55,7 +55,7 @@ class SelectorServer:
                                 data=self.on_accept)
 
         self.current_peers = {}
-        self._controle = controle.Controle()
+        self._controle = ControleApp()
         self._server_on_running = True
 
 

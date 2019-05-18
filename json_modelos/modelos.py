@@ -21,6 +21,26 @@ class Conversor:
         for bkps in servidor.backups:
             pass
 
+class Servidor_local:
+
+    def __init__(self, dict):
+        self._host = dict['host']
+        self._porta = dict['porta']
+        self._qtd_conexoes = dict['qtd_conexoes']
+
+    @property
+    def host(self):
+        return self._host
+
+    @property
+    def porta(self):
+        return int(self._porta)
+
+    @property
+    def qtd_conexoes(self):
+        return int(self._qtd_conexoes)
+
+
 class Servidor:
 
     def __init__(self, dict):
@@ -125,15 +145,15 @@ class Ftp:
 
     @host.setter
     def host(self, valor):
-        return self._dict['host'] = valor
+        self._dict['host'] = valor
 
     @property
     def porta(self):
-        return self._dict['porta']
+        return int(self._dict['porta'])
 
     @porta.setter
     def porta(self, valor):
-        self._dict['porta'] = valor
+        self._dict['porta'] = str(valor)
 
 class Backup:
 

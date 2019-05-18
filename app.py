@@ -1,18 +1,7 @@
-import json
-import time
-from json_modelos.modelos import Servidor, Conversor
-from comunicacao.nbservidor import ConexaoThread
 from configuracao.config import Configuracao
+from comunicacao.servidor import SelectorServer
 
-
-c = Configuracao()
-
-servidores = c.get_servidores()
-
-servidor = servidores[0]
-dict_mensagem = {
-    'comando':'update_list_bkps'
-}
-dict_mensagem['backup'] = servidor.backups
-mensagem = json.dumps(dict_mensagem)
-print(mensagem)
+config = Configuracao()
+config_servidor = config.get_servidor()
+servidor = SelectorServer(config_servidor.host, config_servidor.porta, config_servidor.qtd_conexoes)
+servidor.serve_forever()

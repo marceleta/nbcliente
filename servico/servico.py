@@ -1,7 +1,8 @@
 import ftplib
-from config import Configuracao
+from configuracao.config import Configuracao
 from threading import Thread
 import time
+import json
 
 class Gestao_download:
 
@@ -12,11 +13,16 @@ class Gestao_download:
         self._download_em_andamento = []
         self._download_finalizados = []
         self._iniciar_servicos()
+        self._config = Configuracao()
 
     def adicionar(self, servidor, arquivos):
-        lista_arquivos = arquivos['arquivos']
+        path_destino = self._config.get_backup_dir(servidor.nome)
+        print('path_destino: {}'.format(path_destino))
+        print('gestao_download')
+        lista_arquivos = arquivos['conteudo']
+        print('lista_arquivos size: {}'.format(len(lista_arquivos)))
         for arquivo in lista_arquivos:
-            download_ftp = Download_ftp(arquivo, servidor)
+            download_ftp = Download_ftp(arquivo, path_destino, servidor)
             thread = Download_thread(download_ftp, arquivo['backup'])
             self._download_em_espera[arquivo['backup']] = thread
 
@@ -25,10 +31,8 @@ class Gestao_download:
             monitora que nao mais que nao dois downloads ao mesmo tempo
         '''
         while self._loop_gestao:
-            sel._numero_execucoes = 0
-            keys = self._download_em_andamento.keys()
-            for key in keys:
-                thread = self._download_em_andamento[key]
+            self._numero_execucoes = 0
+            for thread in self._download_em_andamento:
                 if thread.is_alive():
                     self._numero_execucoes += 1
 
@@ -55,9 +59,6 @@ class Gestao_download:
         monitor_executando = Thread(target=self._monitor_downloads_executando, name='monitor_executando')
         monitor_executando.start()
         self._thread_gestao.append(monitor_executando)
-        monitor_espera = Thread(target=self._monitor_download_espera, name='monitor_espera')
-        monitor_espera.start()
-        self._thread_gestao.append(monitor_espera)
         monitor_finalizado = Thread(target=self._remove_download_finalizado, name='monitor_finalizados')
         monitor_finalizado.start()
         self._thread_gestao.append(monitor_finalizado)
@@ -110,32 +111,43 @@ class Download_thread(Thread):
         self._download_ftp = download_ftp
 
     def run(self):
-        self._download_tp.iniciar()
+        self._download_ftp.iniciar()
 
     def get_download_ftp(self):
         return self._download_ftp
 
+
+
 class Download_ftp:
 
-    def __init__(self, arquivo, servidor):
+    def __init__(self, arquivo, path_destino, config_servidor):
         '''
             arquivo - dicionario com as informacoes dos arquivos para download
             servidor - objeto com as informacoes para conexao com servidor
         '''
-        self._servidor = servidor
+        self._config_servidor = config_servidor
         self._arquivo = arquivo
         self._config = Configuracao()
-        self._config_ftp()
-
+        self._path_destino = path_destino
 
     def msg_abrir_ftp(self):
         '''
         Mensagem para enviar ao servidor para abrir FTP
         '''
-        comando = {'comando':'iniciar_ftp'}
-        comando[self._arquivo['backup']] = ['path':self._arquivo['path'], 'nome':self._arquivo['nome']]
+        comando = {'comando':'iniciar_ftp',
+                    'backup':{
+                        'path':self._arquivo['path'],
+                        'arquivo':self._arquivo['arquivo'],
+                        'nome':self._arquivo['backup']
+                    }
+        }
+        #comando[self._arquivo['backup']] = {
+        #                        'path':self._arquivo['path'],
+        #                        'nome':self._arquivo['nome']
+        #                        }
 
-        return json.dumps(comando)
+
+        return comando
 
     def msg_fechar_ftp(self):
 
@@ -144,18 +156,28 @@ class Download_ftp:
 
         return json.dumps(comando)
 
-    def _config_ftp(self):
-        self._ftp = ftplib.FTP(host=self._servidor.host, user=self._servidor.obj_ftp.usuario,
-                                passwd=self._servidor.obj_ftp.senha)
-        self._ftp.cwd(self._arquivo['path'])
-        self._path_destino = self._config.get_backup_dir(self._servidor.name) + '/' + self._arquivo['nome']
 
     def iniciar(self):
         resultado = False
+        print('host: {}'.format(self._config_servidor.host))
+        print('porta: {}'.format(self._config_servidor.porta))
+        print('usuario: {}'.format(self._config_servidor.usuario))
+        print('senha: {}'.format(self._config_servidor.senha))
+        print('path: {}'.format(self._arquivo['path']))
         try:
-            self._ftp.retrbinary("RETR "+self._arquivo['nome'], open(self._path_destino, 'wb').write)
+            print('try ftp')
+            self._ftp = ftplib.FTP('')
+            self._ftp.connect(self._config_servidor.host, self._config_servidor.porta)
+            self._ftp.login(user=self._config_servidor.usuario, passwd=self._config_servidor.senha)
+            resposta = self._ftp.retrlines('LIST')
+            print(resposta)
+            #path_destino = self._config.get_backup_dir(self._config_servidor.name) + '/' + self._arquivo['arquivo']
+            destino = self._path_destino + '/' + self._arquivo['arquivo']
+            self._ftp.retrbinary("RETR "+self._arquivo['arquivo'], open(destino, 'wb').write)
+
             resultado = True
-        except:
+        except ftplib.all_errors as msg:
+            print('except: {}'.format(msg))
             resultado = False
 
 

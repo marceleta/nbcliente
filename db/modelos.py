@@ -2,7 +2,8 @@ from peewee import *
 import datetime
 from configuracao.config import Configuracao
 
-path = Configuracao.config_path() + '/db/dbcliente.db'
+config = Configuracao()
+path = config.config_path() + 'db/dbcliente.db'
 db = SqliteDatabase(path)
 
 class Persistir:
@@ -15,7 +16,7 @@ class Persistir:
         config.status = status
         config.save()
 
-class BaseModel(Model)
+class BaseModel(Model):
     class Meta:
         database = db
 
