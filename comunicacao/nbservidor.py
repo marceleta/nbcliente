@@ -12,23 +12,29 @@ class ConexaoThread(Thread):
         self._conexao = Conexao(servidor.host, servidor.porta, mensagem)
         self._resposta = None
         self._conteudo = None
-        self._is_conectado = False
+        self._is_comunicacao = False
 
     def run(self):
         if self._conexao.is_conectado():
-            self._is_conectado = True
             self._conexao.enviar_mensagem()
             self._processar_mensagem(self._conexao.receber_mensagem())
             self._conexao.fechar_conexao()
+            print('run pos fechar_conexao')
+            self._is_comunicacao = True
+            print('run is_comunicacao: {}'.format(self._is_comunicacao))
 
     def is_comunicacao(self):
-        return self._is_conectado
+        return self._is_comunicacao
 
     def _processar_mensagem(self, mensagem):
         _json = json.loads(mensagem)
+        print('_processar_mensagem:mensagem: {}'.format(_json))
         self._resposta = _json['resposta']
         del _json['resposta']
-        self._conteudo = _json
+        if self._resposta == 'ok':
+            self._conteudo = None
+        else:
+            self._conteudo = _json
 
 
 

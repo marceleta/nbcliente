@@ -9,19 +9,29 @@ db = SqliteDatabase(path)
 class Persistir:
 
     @staticmethod
-    def config_enviadas(nome_servidor, status):
-        config = Config_enviadas()
+    def transacoes(nome_servidor, status, descricao):
+        config = Transacoes()
         config.data_envio = datetime.datetime.now()
         config.nome_servidor = nome_servidor
         config.status = status
         config.save()
 
+    @staticmethod
+    def criar_db():
+        try:
+            arquivo = open(path)
+            arquivo.close()
+        except FileNotFoundError:
+            Transacoes.create_table()
+
+
 class BaseModel(Model):
     class Meta:
         database = db
 
-class Config_enviadas(BaseModel):
+class Transacoes(BaseModel):
 
     data_envio = DateTimeField()
     nome_servidor = CharField(max_length=50)
     status = CharField(max_length=10)
+    descricao = CharField(max_length=200)

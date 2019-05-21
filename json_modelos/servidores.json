@@ -9,7 +9,7 @@
                 "usuario":"marcelo",
                 "senha":"12345",
                 "host":"localhost",
-                "porta":"5001"
+                "porta":"5002"
             },
         "backups":[
             {
@@ -52,7 +52,7 @@
                 "usuario":"marcelo",
                 "senha":"12345",
                 "host":"localhost",
-                "porta":"5001"
+                "porta":"5002"
             },
         "backups":[
             {

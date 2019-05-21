@@ -1,7 +1,7 @@
 from backup.backup import Backup
-from json_modelos.modelos import Servidor, Servidor_local
 import platform, os
 import json
+from json_modelos.modelos import Servidor, Servidor_local, Backup
 
 
 class Configuracao:
@@ -91,14 +91,3 @@ class Configuracao:
 
     def get_backup_dir_path(self, nome_servidor):
         return self.get_backup_dir[nome_servidor]
-'''
-    def _verificar_banco(self):
-
-        try:
-            path_db = self.config_path() + 'db/nbcliente.db'
-            arquivo = open(path_db)
-            arquivo.close()
-        except FileNotFoundError:
-            Servidor.create_table()
-            Backup.create_table()
-'''
