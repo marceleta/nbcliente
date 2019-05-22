@@ -13,6 +13,7 @@ class Persistir:
         config = Transacoes()
         config.data_envio = datetime.datetime.now()
         config.nome_servidor = nome_servidor
+        config.descricao = descricao
         config.status = status
         config.save()
 

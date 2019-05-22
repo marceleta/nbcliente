@@ -19,7 +19,6 @@ class ConexaoThread(Thread):
             self._conexao.enviar_mensagem()
             self._processar_mensagem(self._conexao.receber_mensagem())
             self._conexao.fechar_conexao()
-            print('run pos fechar_conexao')
             self._is_comunicacao = True
             print('run is_comunicacao: {}'.format(self._is_comunicacao))
 

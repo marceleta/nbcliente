@@ -48,7 +48,6 @@ class Gestao_download:
 
 
     def _remove_download_finalizado(self):
-
         while self._loop_gestao:
             if len(self._download_em_andamento) > 0:
                 tamanho_lista = len(self._download_em_andamento)
@@ -105,12 +104,17 @@ class Gestao_download:
         return lista_msg
 
     def remove_finalizado(self, nome_backup):
-        tamanho_lista = len(self._download_finalizados)
+        print('remove_finalizado {}'.format(nome_backup))
+        for thread in self._download_finalizados:
+            if nome_backup == thread.name:
+                self._download_finalizados.remove(thread)
 
-        for index in range(tamanho_lista):
-            thread = self._download_finalizados[index]
-            if thread.name == nome_backup:
-                del self._download_finalizados[index]
+        #tamanho_lista = len(self._download_finalizados)
+
+        #for index in range(tamanho_lista):
+        #    thread = self._download_finalizados[index]
+        #    if thread.name == nome_backup:
+        #        del self._download_finalizados[index]
 
     def is_executando(self):
         return self._loop_gestao

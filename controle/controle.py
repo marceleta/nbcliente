@@ -124,20 +124,25 @@ class ControleApp:
             print('_monitor_conexao_servidores')
             print('lista_conexoes: {}'.format(self._thread_conexao_servidores))
             range_lista = len(self._thread_conexao_servidores)
-            for index in range(range_lista):
-                thread = self._thread_conexao_servidores[index]
+            print('_monitor_conexao_servidores:range_lista: {}'.format(range_lista))
+            for thread in self._thread_conexao_servidores:
+                print('_monitor_conexao_servidores:thread: {}'.format(thread))
+                #thread = self._thread_conexao_servidores[index]
                 print('monitor thread: {}'.format(thread.name))
                 if thread.is_comunicacao():
                     print('if thread.is_comunicacao()')
                     self._tratamento_resposta(thread.get_resposta(), thread.get_conteudo(), thread.get_servidor())
-                    del self._thread_conexao_servidores[index]
+                    #itens_a_remover.append(thread)
+                    self._thread_conexao_servidores.remove(thread)
 
-            time.sleep(5)
+
+
+            time.sleep(60)
 
 
     def _tratamento_resposta(self, resposta, conteudo, servidor):
-
-        if resposta == 'ok':
+        print('_tratamento_resposta: resposta: {}, conteudo: {}'.format(resposta, conteudo))
+        if resposta == 'ok' and resposta == 'ftp_rodando':
             Persistir.transacoes(servidor.nome, resposta, conteudo)
         elif resposta == 'lst_bkps_prontos':
             self._adicionar_download_fila(servidor, conteudo)
@@ -173,15 +178,14 @@ class ControleApp:
 
     def _adicionar_download_fila(self, servidor, conteudo):
         self._gestao_d.adicionar(servidor, conteudo)
-        #lista_resposta = self._gestao_d.get_msg_em_espera()
-        #for resposta in lista_resposta:
-        #    print('abertuta_ftp_servidor:resposta: {}'.format(resposta))
-        #    self._enviar_mensagem_servidor(servidor, resposta)
 
     def _monitor_download_concluido(self):
+        print('_monitor_download_concluido')
         while self._loop_controle:
             for mensagem in self._gestao_d.get_msg_finalizados():
                 self._enviar_mensagem_servidor(mensagem['servidor'], mensagem['comando'])
+                self._gestao_d.remove_finalizado(mensagem['nome'])
+
 
             time.sleep(60)
 
