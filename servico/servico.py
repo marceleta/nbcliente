@@ -122,9 +122,9 @@ class Gestao_download:
     def parar_servicos(self):
         self._loop_gestao = False
 
-    def is_download_em_espera(self):
+    def is_download(self):
         is_espera = False
-        if len(self._download_em_espera) > 0:
+        if len(self._download_em_espera) > 0 and len(self._download_em_andamento) > 0 and len(self._download_finalizados) > 0:
             is_espera = True
 
         return is_espera
@@ -201,6 +201,7 @@ class Download_ftp:
         print('senha: {}'.format(self._config_servidor.senha))
         print('path: {}'.format(self._arquivo['path']))
         try:
+            time.sleep(120)
             print('try ftp')
             self._ftp = ftplib.FTP('')
             self._ftp.connect(self._config_servidor.host, self._config_servidor.porta)

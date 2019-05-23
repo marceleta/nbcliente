@@ -110,13 +110,13 @@ class ControleApp:
             print('lista_servidores: {}'.format(lista_servidores))
             for servidor in lista_servidores:
                 tratamento = Tratamento_Servidor(servidor)
-                print('servidor: {} is_execucao: {}'.format(servidor.nome, tratamento.is_execucao()))
-                if tratamento.is_execucao() and not self._gestao_d.is_download_em_espera():
+                print('self._gestao_d.is_download_em_espera() {}'.format(self._gestao_d.is_download()))
+                if tratamento.is_execucao() and not self._gestao_d.is_download():
                     mensagem = {'comando':'list_bkps_prontos'}
                     print('enviar_mensagem')
                     self._enviar_mensagem_servidor(servidor, mensagem)
 
-            time.sleep(60)
+            time.sleep(600)
 
     def _monitor_conexao_servidores(self):
         print('entrada _monitor_conexao_servidores')
@@ -127,17 +127,15 @@ class ControleApp:
             print('_monitor_conexao_servidores:range_lista: {}'.format(range_lista))
             for thread in self._thread_conexao_servidores:
                 print('_monitor_conexao_servidores:thread: {}'.format(thread))
-                #thread = self._thread_conexao_servidores[index]
                 print('monitor thread: {}'.format(thread.name))
                 if thread.is_comunicacao():
                     print('if thread.is_comunicacao()')
                     self._tratamento_resposta(thread.get_resposta(), thread.get_conteudo(), thread.get_servidor())
-                    #itens_a_remover.append(thread)
                     self._thread_conexao_servidores.remove(thread)
 
 
 
-            time.sleep(60)
+            time.sleep(10)
 
 
     def _tratamento_resposta(self, resposta, conteudo, servidor):
@@ -184,7 +182,7 @@ class ControleApp:
         while self._loop_controle:
             for mensagem in self._gestao_d.get_msg_finalizados():
                 self._enviar_mensagem_servidor(mensagem['servidor'], mensagem['comando'])
-                self._gestao_d.remove_finalizado(mensagem['nome'])
+                self._gestao_d.remove_finalizado(mensagem['comando']['nome'])
 
 
             time.sleep(60)

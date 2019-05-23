@@ -21,7 +21,7 @@
                 "fonte": "hirens-bootcd-15-2-es-en-win.zip",
                 "periodo":"diario",
                 "dia_semana":"",
-                "hora_execucao":"07:45",
+                "hora_execucao":"14:15",
                 "sc_backup":"/home/marcelo/python/nbackup_2/app/sc_backup.sh",
                 "sc_pre_execucao":"/home/marcelo/python/nbackup_2/app/sc_pre.sh",
                 "sc_pos_execucao":"/home/marcelo/python/nbackup_2/app/sc_pos.py"
@@ -35,7 +35,7 @@
                 "fonte": "CentOS.ova",
                 "periodo":"diario",
                 "dia_semana":"",
-                "hora_execucao":"07:47",
+                "hora_execucao":"14:20",
                 "sc_backup":"/home/marcelo/python/nbackup_2/app/sc_backup.sh",
                 "sc_pre_execucao":"/home/marcelo/python/nbackup_2/app/sc_pre.sh",
                 "sc_pos_execucao":"/home/marcelo/python/nbackup_2/app/sc_pos.py"
