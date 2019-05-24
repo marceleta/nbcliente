@@ -40,19 +40,7 @@ class Configuracao:
         path = self.config_path() +'configuracao/backup_dir.json'
         with open(path) as backup_dir:
             self._backup_dir = json.load(backup_dir)
-
-        '''
-        try:
-            arquivo = open(path, 'r')
-            servidores = json.loads(arquivo)
-            keys = servidores.keys()
-            for k in keys:
-                dict_server = servidores[k]
-                serv = Servidor(dict_server)
-                self._lista_servidores.append(serv)
-        except FileNotFound:
-            self._lista_servidores = None
-        '''
+        
 
     def salvar_servidores(self, servidores):
         resposta = False
@@ -63,7 +51,7 @@ class Configuracao:
             arquivo.write(servidores)
             arquivo.close()
             resposta = True
-        except FileNotFound:
+        except FileNotFoundError:
             resposta = False
 
         return resposta

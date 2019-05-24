@@ -109,13 +109,6 @@ class Gestao_download:
             if nome_backup == thread.name:
                 self._download_finalizados.remove(thread)
 
-        #tamanho_lista = len(self._download_finalizados)
-
-        #for index in range(tamanho_lista):
-        #    thread = self._download_finalizados[index]
-        #    if thread.name == nome_backup:
-        #        del self._download_finalizados[index]
-
     def is_executando(self):
         return self._loop_gestao
 

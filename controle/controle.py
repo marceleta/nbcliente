@@ -51,6 +51,12 @@ class ControleApp:
         monitor_download_andamento.start()
         self._thread_controle[self._monitor_download_andamento] = monitor_download_andamento
 
+    def _reiniciar_threads(self):
+        self._loop_controle = False
+        time.sleep(60)
+        self._iniciar_threads()
+
+
     def set_data(self, data):
         self._data = data
         self._decode_data(self._data)
@@ -178,7 +184,6 @@ class ControleApp:
         self._gestao_d.adicionar(servidor, conteudo)
 
     def _monitor_download_concluido(self):
-        print('_monitor_download_concluido')
         while self._loop_controle:
             for mensagem in self._gestao_d.get_msg_finalizados():
                 self._enviar_mensagem_servidor(mensagem['servidor'], mensagem['comando'])
@@ -215,10 +220,8 @@ class Tratamento_Servidor:
 
         for backups in lista_bkps:
             if backups.periodo == 'diario':
-                print('diario')
                 self._execucao_diaria(backups)
             elif backups.periodo == 'semanal':
-                print('semanal')
                 self._execucao_semanal(backups)
 
 
@@ -234,6 +237,4 @@ class Tratamento_Servidor:
         return self._is_execucao
 
     def _is_hora_execucao(self, backups):
-        print('str_to_time: {}'.format(DataConv.str_to_time(backups.hora_execucao)))
-        print('DataConv.hora_agora() {}'.format(DataConv.hora_agora()))
         return DataConv.hora_agora() >= DataConv.str_to_time(backups.hora_execucao)
