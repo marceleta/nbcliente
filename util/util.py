@@ -1,4 +1,7 @@
 import datetime
+import logging
+
+logging.basicConfig(filename='nbcliente.log', filenome='a', format='%(asctime)s : %(message)s',datefmt='%d/%m/%Y %I:%M')
 
 class DataConv:
 
@@ -47,3 +50,21 @@ class DataConv:
     def hoje_dia_semana(self):
         dia = datetime.datetime.today().weekday()
         return dict_dia_semana[dia]
+
+class Log:
+    
+    @staticmethod
+    def debug(self, mensagem):
+        logging.debug(mensagem)
+
+    @staticmethod
+    def info(self, mensagem):
+        logging.info(mensagem)
+
+    @staticmethod
+    def warning(self, mensagem):
+        logging.warning(mensagem)
+
+    @staticmethod
+    def error(self, mensagem):
+        logging.error(mensagem)

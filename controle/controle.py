@@ -6,7 +6,7 @@ from threading import Thread
 from configuracao.config import Configuracao
 from comunicacao.nbservidor import ConexaoThread
 from db.modelos import Persistir
-from util.util import DataConv
+from util.util import DataConv, Log
 from servico.servico import Gestao_download
 
 class ControleApp:
@@ -30,32 +30,37 @@ class ControleApp:
         verf_conex_serv = Thread(target=self._monitor_conexao_servidores, name=self._verificacao_servidores)
         verf_conex_serv.start()
         self._thread_controle[self._verificacao_servidores] = verf_conex_serv
+        Log.info('Iniciando Thread: {}'.format(self._verificacao_servidores))
 
         self._verifica_bkps_prontos = 'verifica_bkps_prontos'
         verifica_bkps_prontos = Thread(target=self._verificar_bkps_prontos, name=self._verifica_bkps_prontos)
         verifica_bkps_prontos.start()
         self._thread_controle[self._verifica_bkps_prontos] = verifica_bkps_prontos
+        Log.info('Iniciando Thread: {}'.format(self._verifica_bkps_prontos))
 
         self._verifica_download_concluido = 'monitor_bkps_finalizados'
         monitor_download_concluido = Thread(target=self._monitor_download_concluido, name=self._verifica_download_concluido)
         monitor_download_concluido.start()
         self._thread_controle[self._verifica_download_concluido] = monitor_download_concluido
+        Log.info('Iniciando Thread:{}'.format(self._verifica_download_concluido))
 
         self._monitor_download_finalizado = 'monitor_download_finalizados'
         monitor_download_finalizados = Thread(target=self._fecha_ftp_servidor, name=self._monitor_download_finalizado)
         monitor_download_finalizados.start()
         self._thread_controle[self._monitor_download_finalizado] = monitor_download_finalizados
+        Log.info('Iniciando Thread: {}'.format(self._monitor_download_finalizado))
 
         self._monitor_download_andamento = 'monitor_download_andamento'
         monitor_download_andamento = Thread(target=self._monitor_execucao_download, name=self._monitor_download_andamento)
         monitor_download_andamento.start()
         self._thread_controle[self._monitor_download_andamento] = monitor_download_andamento
+        Log.info('Iniciando Thread: {}'.format(self._monitor_download_andamento))
 
     def _reiniciar_threads(self):
+        Log.info('reiniciando thread')
         self._loop_controle = False
         time.sleep(60)
         self._iniciar_threads()
-
 
     def set_data(self, data):
         self._data = data
@@ -76,7 +81,6 @@ class ControleApp:
         data_json = json.loads(self._data.decode('utf-8'))
         comando = data_json['comando']
         del data_json['comando']
-        print('comando: {}'.format(comando))
 
         if comando == 'lst_bkps_update':
             self._atualizar_lst_bkps(data_json)
@@ -100,7 +104,7 @@ class ControleApp:
             'comando':'update_lst_bkp',
             'backups':servidor.backups
             }
-
+        
             self._enviar_mensagem_servidor(servidor, mensagem)
 
 
@@ -108,68 +112,55 @@ class ControleApp:
         thread = ConexaoThread(servidor, mensagem)
         thread.start()
         self._thread_conexao_servidores.append(thread)
+        Log.info('enviando mensagem')
 
 
     def _verificar_bkps_prontos(self):
         lista_servidores = self._config.get_servidores()
         while self._loop_controle:
-            print('lista_servidores: {}'.format(lista_servidores))
             for servidor in lista_servidores:
                 tratamento = Tratamento_Servidor(servidor)
-                print('self._gestao_d.is_download_em_espera() {}'.format(self._gestao_d.is_download()))
                 if tratamento.is_execucao() and not self._gestao_d.is_download():
                     mensagem = {'comando':'list_bkps_prontos'}
-                    print('enviar_mensagem')
                     self._enviar_mensagem_servidor(servidor, mensagem)
 
+            Log.info('verificação de backups prontos')
             time.sleep(600)
 
     def _monitor_conexao_servidores(self):
-        print('entrada _monitor_conexao_servidores')
         while self._loop_controle:
-            print('_monitor_conexao_servidores')
-            print('lista_conexoes: {}'.format(self._thread_conexao_servidores))
             range_lista = len(self._thread_conexao_servidores)
-            print('_monitor_conexao_servidores:range_lista: {}'.format(range_lista))
             for thread in self._thread_conexao_servidores:
-                print('_monitor_conexao_servidores:thread: {}'.format(thread))
-                print('monitor thread: {}'.format(thread.name))
                 if thread.is_comunicacao():
-                    print('if thread.is_comunicacao()')
                     self._tratamento_resposta(thread.get_resposta(), thread.get_conteudo(), thread.get_servidor())
                     self._thread_conexao_servidores.remove(thread)
-
-
-
             time.sleep(10)
 
 
     def _tratamento_resposta(self, resposta, conteudo, servidor):
-        print('_tratamento_resposta: resposta: {}, conteudo: {}'.format(resposta, conteudo))
         if resposta == 'ok' and resposta == 'ftp_rodando':
             Persistir.transacoes(servidor.nome, resposta, conteudo)
         elif resposta == 'lst_bkps_prontos':
             self._adicionar_download_fila(servidor, conteudo)
         elif resposta == 'salvar_bkps_ok':
-            Persistir.config_enviadas(servidor.nome, resposta)
+            Persistir.transacoes(servidor.nome, resposta)
         elif resposta == 'ftp_pronto_download':
             print('ftp_pronto_download')
+            Log.info('ftp pronto para download, servidor {}'.format(servidor.nome))
             self._gestao_d.executa_download(conteudo['conteudo'])
 
 
     def _fecha_ftp_servidor(self):
         lista_finalizados = self._gestao_d.get_msg_finalizados()
-        print('lista_finalizado: {}'.format(lista_finalizados))
-        for mensagem in lista_finalizados:
+        for mensagem in lista_finalizados:            
             servidor = mensagem['servidor']
+            Log.info('fechando ftp, servidor {}'.format(servidor))
             del mensagem['servidor']
             self._enviar_mensagem_servidor(servidor, mensagem)
             self._gestao_d.remove_finalizado(mensagem['nome'])
 
     def _monitor_execucao_download(self):
         while self._loop_controle:
-            print('_monitor_execucao_download')
-            print('_gestao_d.get_downloads_executando(): {}'.format(self._gestao_d.get_downloads_executando()))
             if self._gestao_d.get_downloads_executando() == 0:
                 comando = self._gestao_d.get_msg_em_espera()
                 if comando != None:

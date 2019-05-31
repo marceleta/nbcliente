@@ -3,6 +3,7 @@ from configuracao.config import Configuracao
 from threading import Thread
 import time
 import json
+from util.util import Log
 
 class Gestao_download:
 
@@ -20,16 +21,15 @@ class Gestao_download:
         servidor -  configuracao do servidor remoto
         arquivos - lista de arquivos para download
         '''
-        print('lista_arquivos: {}'.format(lista_arquivos))
         path_destino = self._config.get_backup_dir(servidor.nome)
-        print('path_destino: {}'.format(path_destino))
-        print('gestao_download')
-        print('lista_arquivos size: {}'.format(len(lista_arquivos)))
         arquivos = lista_arquivos['conteudo']
         for arquivo in arquivos:
             download_ftp = Download_ftp(arquivo, path_destino, servidor)
             thread = Download_thread(download_ftp, arquivo['backup'])
             self._download_em_espera[arquivo['backup']] = thread
+
+        Log.info('Gestao download bkps adicionados, servidor: {}'.format(servidor.nome))
+        
 
     def get_downloads_executando(self):
         '''
@@ -40,30 +40,23 @@ class Gestao_download:
 
     def executa_download(self, nome_backup):
 
-        print('download_em_espera: index: {}'.format(self._download_em_espera.keys()))
         thread = self._download_em_espera[nome_backup]
         self._download_em_andamento.append(thread)
         del self._download_em_espera[nome_backup]
         thread.start()
+        Log.info('iniciando thread {}'.format(nome_backup))
 
 
     def _remove_download_finalizado(self):
         while self._loop_gestao:
             if len(self._download_em_andamento) > 0:
                 tamanho_lista = len(self._download_em_andamento)
-                print('tamanho_lista em andamento: {}'.format(tamanho_lista))
                 for index in range(tamanho_lista):
                     thread = self._download_em_andamento[index]
-                    print('remove: is_alive: {}'.format(thread.is_alive()))
-                    print('remove: is_executado: {}'.format(thread.is_executado()))
                     if thread.is_executado():
                         self._download_finalizados.append(thread)
                         del self._download_em_andamento[index]
-            print('tamanho_em_espera: {}'.format(len(self._download_em_espera)))
-            print('tamanho_finalizados: {}'.format(len(self._download_finalizados)))
-            print('tamanho_em_andamento: {}'.format(len(self._download_em_andamento)))
-
-
+            
             time.sleep(10)
 
 
@@ -73,6 +66,7 @@ class Gestao_download:
         monitor_finalizado = Thread(target=self._remove_download_finalizado, name='monitor_finalizados')
         monitor_finalizado.start()
         self._thread_gestao.append(monitor_finalizado)
+        Log.info('iniciando thread: monitor finalizados')
 
     def get_msg_em_espera(self):
         dicionario = None
@@ -104,7 +98,6 @@ class Gestao_download:
         return lista_msg
 
     def remove_finalizado(self, nome_backup):
-        print('remove_finalizado {}'.format(nome_backup))
         for thread in self._download_finalizados:
             if nome_backup == thread.name:
                 self._download_finalizados.remove(thread)
@@ -136,12 +129,14 @@ class Download_thread(Thread):
 
     def __init__(self, download_ftp, nome):
         Thread.__init__(self, name=nome)
+        self._nome = nome
         self._download_ftp = download_ftp
         self._is_executado = False
 
     def run(self):
         self._download_ftp.iniciar()
         self._is_executado = True
+        Log.info('[download_thread] iniciando thread: {}'.format(self._nome))
 
     def get_download_ftp(self):
         return self._download_ftp
@@ -188,26 +183,17 @@ class Download_ftp:
 
     def iniciar(self):
         resultado = False
-        print('host: {}'.format(self._config_servidor.host))
-        print('porta: {}'.format(self._config_servidor.porta))
-        print('usuario: {}'.format(self._config_servidor.usuario))
-        print('senha: {}'.format(self._config_servidor.senha))
-        print('path: {}'.format(self._arquivo['path']))
         try:
             time.sleep(120)
-            print('try ftp')
             self._ftp = ftplib.FTP('')
             self._ftp.connect(self._config_servidor.host, self._config_servidor.porta)
             self._ftp.login(user=self._config_servidor.usuario, passwd=self._config_servidor.senha)
             destino = self._path_destino + '/' + self._arquivo['arquivo']
-            print('retrbinary')
             self._ftp.retrbinary("RETR "+self._arquivo['arquivo'], open(destino, 'wb').write)
-            print('final retrbinary')
             resultado = True
         except ftplib.all_errors as msg:
-            print('except: {}'.format(msg))
+            Log.info('[download_ftp] erro ftp: {}'.format(msg))
             resultado = False
-
 
     def get_servidor(self):
         return self._servidor

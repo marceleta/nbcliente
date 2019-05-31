@@ -2,6 +2,7 @@
 import socket
 import json
 import time
+from util.util import Log
 from threading import Thread
 
 class ConexaoThread(Thread):
@@ -12,7 +13,7 @@ class ConexaoThread(Thread):
         self._conexao = Conexao(servidor.host, servidor.porta, mensagem)
         self._resposta = None
         self._conteudo = None
-        self._is_comunicacao = False
+        self._is_comunicacao = False        
 
     def run(self):
         if self._conexao.is_conectado():
@@ -20,14 +21,13 @@ class ConexaoThread(Thread):
             self._processar_mensagem(self._conexao.receber_mensagem())
             self._conexao.fechar_conexao()
             self._is_comunicacao = True
-            print('run is_comunicacao: {}'.format(self._is_comunicacao))
+            
 
     def is_comunicacao(self):
         return self._is_comunicacao
 
     def _processar_mensagem(self, mensagem):
         _json = json.loads(mensagem)
-        print('_processar_mensagem:mensagem: {}'.format(_json))
         self._resposta = _json['resposta']
         del _json['resposta']
         if self._resposta == 'ok':
@@ -35,19 +35,14 @@ class ConexaoThread(Thread):
         else:
             self._conteudo = _json
 
-
-
     def get_resposta(self):
-        print('resposta: {}'.format(self._resposta))
         return self._resposta
 
     def get_conteudo(self):
-        print('conteudo {}'.format(self._conteudo))
         return self._conteudo
 
     def get_servidor(self):
         return self._servidor
-
 
 
 class Conexao:
@@ -72,9 +67,12 @@ class Conexao:
     def enviar_mensagem(self):
         msg_encode =  json.dumps(self._mensagem).encode('utf-8')
         self._client_socket.sendall(msg_encode)
+        Log.info('pacote enviado, host:{}'.format(self._host))
+
 
     def receber_mensagem(self):
         msg = self._client_socket.recv(4096)
+        Log.info('mensagem recebida, host: {}'.format(self._host))
         return msg.decode('utf-8')
 
     def fechar_conexao(self):

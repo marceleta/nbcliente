@@ -1,6 +1,7 @@
 from backup.backup import Backup
 import platform, os
 import json
+from util.util import Log
 from json_modelos.modelos import Servidor, Servidor_local, Backup
 
 
@@ -24,9 +25,10 @@ class Configuracao:
                 dict_server = servidores[k]
                 serv = Servidor(dict_server)
                 self._lista_servidores.append(serv)
-
         else:
-            self._lista_servidores = None
+            self._lista_servidores = None        
+
+        Log.info('leitura do arquivo: servidores.json')
 
     def _set_servidor(self):
         path = self.config_path() + 'json_modelos/config_servidor.json'
@@ -35,11 +37,15 @@ class Configuracao:
             s = _json['servidor_local']
             self._servidor = Servidor_local(s)
 
+        Log.info('leitura do arquivo: config_servidores.json')
+
 
     def _set_backup_dir(self):
         path = self.config_path() +'configuracao/backup_dir.json'
         with open(path) as backup_dir:
             self._backup_dir = json.load(backup_dir)
+
+        Log.info('leitura do arquivo: backup_dir.json')
         
 
     def salvar_servidores(self, servidores):
@@ -51,8 +57,10 @@ class Configuracao:
             arquivo.write(servidores)
             arquivo.close()
             resposta = True
+            Log.info('escrita no arquivo servidores.json')
         except FileNotFoundError:
-            resposta = False
+            Log.error('erro ao escrever no arquivo servidores.json, FileNotFoundError')
+            resposta = False        
 
         return resposta
 

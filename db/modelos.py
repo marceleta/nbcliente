@@ -1,5 +1,6 @@
 from peewee import *
 import datetime
+from util.util import Log
 from configuracao.config import Configuracao
 
 config = Configuracao()
@@ -16,6 +17,7 @@ class Persistir:
         config.descricao = descricao
         config.status = status
         config.save()
+        Log.info('transacao salva')
 
     @staticmethod
     def criar_db():
