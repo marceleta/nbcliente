@@ -2,6 +2,7 @@ from peewee import *
 import datetime
 from util.util import Log
 from configuracao.config import Configuracao
+from util.util import Log
 
 config = Configuracao()
 path = config.config_path() + 'db/dbcliente.db'
@@ -26,6 +27,7 @@ class Persistir:
             arquivo.close()
         except FileNotFoundError:
             Transacoes.create_table()
+            Log.info('criando banco de dados')
 
 
 class BaseModel(Model):

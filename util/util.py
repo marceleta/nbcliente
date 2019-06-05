@@ -1,7 +1,7 @@
 import datetime
 import logging
 
-logging.basicConfig(filename='nbcliente.log', filenome='a', format='%(asctime)s : %(message)s',datefmt='%d/%m/%Y %I:%M')
+logging.basicConfig(filename='nbcliente.log', filenome='a', format='%(asctime)s - %(levelname)s - %(message)s',datefmt='%d/%m/%Y %I:%M')
 
 class DataConv:
 
@@ -54,17 +54,17 @@ class DataConv:
 class Log:
     
     @staticmethod
-    def debug(self, mensagem):
+    def debug(mensagem):
         logging.debug(mensagem)
 
     @staticmethod
-    def info(self, mensagem):
+    def info(mensagem):
         logging.info(mensagem)
 
     @staticmethod
-    def warning(self, mensagem):
+    def warning(mensagem):
         logging.warning(mensagem)
 
     @staticmethod
-    def error(self, mensagem):
+    def error(mensagem):
         logging.error(mensagem)
