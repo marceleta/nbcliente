@@ -1,7 +1,7 @@
 import datetime
 import logging
 
-logging.basicConfig(filename='nbcliente.log', filenome='a', format='%(asctime)s - %(levelname)s - %(message)s',datefmt='%d/%m/%Y %I:%M')
+logging.basicConfig(filename='nbcliente.log', filemode='a', format='%(asctime)s - %(levelname)s - %(message)s',datefmt='%d/%m/%Y %I:%M')
 
 class DataConv:
 

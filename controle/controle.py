@@ -79,6 +79,7 @@ class ControleApp:
 
     def processar_mensagem(self):
         data_json = json.loads(self._data.decode('utf-8'))
+        print('data_json: {}'.format(data_json))
         comando = data_json['comando']
         del data_json['comando']
 
@@ -109,6 +110,9 @@ class ControleApp:
 
 
     def _enviar_mensagem_servidor(self, servidor, mensagem):
+        print('---enviar_mensagem----')
+        print('servidor: {}'.format(servidor.nome))
+        print('mensagem: {}'.format(mensagem))
         thread = ConexaoThread(servidor, mensagem)
         thread.start()
         self._thread_conexao_servidores.append(thread)
@@ -138,6 +142,9 @@ class ControleApp:
 
 
     def _tratamento_resposta(self, resposta, conteudo, servidor):
+        print('---_tratamento_resposta---')
+        print('conteudo: {}'.format(conteudo))
+        print('servidor: {}'.format(servidor.nome))
         if resposta == 'ok' and resposta == 'ftp_rodando':
             Persistir.transacoes(servidor.nome, resposta, conteudo)
         elif resposta == 'lst_bkps_prontos':

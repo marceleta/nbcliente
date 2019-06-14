@@ -58,13 +58,13 @@
             {
                 "nome":"backup_1",
                 "backup_auto":"Nao",
-                "path_origem":"/home/marcelo/ISO",
-                "path_destino":"/home/marcelo/backup",
+                "path_origem":"/home/marcelo/fonte/backup1",
+                "path_destino":"/home/marcelo/backup/backup1",
                 "tipo":"arquivo",
                 "fonte": "hirens-bootcd-15-2-es-en-win.zip",
                 "periodo":"diario",
                 "dia_semana":"",
-                "hora_execucao":"17:55",
+                "hora_execucao":"11:00",
                 "sc_backup":"/home/marcelo/python/nbackup_2/app/sc_backup.sh",
                 "sc_pre_execucao":"/home/marcelo/python/nbackup_2/app/sc_pre.sh",
                 "sc_pos_execucao":"/home/marcelo/python/nbackup_2/app/sc_pos.py"
@@ -72,13 +72,13 @@
             {
                 "nome":"backup_2",
                 "backup_auto":"Nao",
-                "path_origem":"/home/marcelo/ISO",
-                "path_destino":"/home/marcelo/backup",
+                "path_origem":"/home/marcelo/fonte/backup2",
+                "path_destino":"/home/marcelo/backup/backup2",
                 "tipo":"arquivo",
                 "fonte": "hirens-bootcd-15-2-es-en-win.zip",
                 "periodo":"diario",
                 "dia_semana":"",
-                "hora_execucao":"17:55",
+                "hora_execucao":"12:00",
                 "sc_backup":"/home/marcelo/python/nbackup_2/app/sc_backup.sh",
                 "sc_pre_execucao":"/home/marcelo/python/nbackup_2/app/sc_pre.sh",
                 "sc_pos_execucao":"/home/marcelo/python/nbackup_2/app/sc_pos.py"
