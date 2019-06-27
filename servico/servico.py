@@ -117,7 +117,7 @@ class Gestao_download:
 
     def is_download(self):
         is_espera = False
-        if len(self._download_em_espera) > 0 and len(self._download_em_andamento) > 0 and len(self._download_finalizados) > 0:
+        if len(self._download_em_espera) > 0 or len(self._download_em_andamento) > 0 or len(self._download_finalizados) > 0:
             is_espera = True
 
         return is_espera
