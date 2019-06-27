@@ -124,7 +124,7 @@ class ControleApp:
         while self._loop_controle:
             for servidor in lista_servidores:
                 tratamento = Tratamento_Servidor(servidor)
-                if tratamento.is_execucao() and not self._gestao_d.is_download() and not self.gestao_d.is_em_espera():
+                if tratamento.is_execucao() and not self._gestao_d.is_download():
                     mensagem = {'comando':'list_bkps_prontos'}
                     self._enviar_mensagem_servidor(servidor, mensagem)
 

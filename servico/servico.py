@@ -82,14 +82,6 @@ class Gestao_download:
 
         return dicionario
 
-    def is_em_espera(self):
-        is_esperando = False
-        if len(self._download_em_espera) > 0:
-            is_esperando = True
-
-        return is_esperando
-
-
     def get_msg_finalizados(self):
         lista_msg = []
 
