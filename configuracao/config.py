@@ -71,7 +71,7 @@ class Configuracao:
         if platform.system() == 'Windows':
             self._path = 'c:/nbcliente/'
         else:
-            self._path = '/home/marcelo/nbcliente/'
+            self._path = '/home/marcelo/python/nbcliente/'
 
         return self._path
 

@@ -129,7 +129,7 @@ class ControleApp:
                     self._enviar_mensagem_servidor(servidor, mensagem)
 
             Log.info('verificação de backups prontos')
-            time.sleep(600)
+            time.sleep(300)
 
     def _monitor_conexao_servidores(self):
         while self._loop_controle:
@@ -138,7 +138,7 @@ class ControleApp:
                 if thread.is_comunicacao():
                     self._tratamento_resposta(thread.get_resposta(), thread.get_conteudo(), thread.get_servidor())
                     self._thread_conexao_servidores.remove(thread)
-            time.sleep(10)
+            time.sleep(5)
 
 
     def _tratamento_resposta(self, resposta, conteudo, servidor):
@@ -154,7 +154,7 @@ class ControleApp:
         elif resposta == 'ftp_pronto_download':
             print('ftp_pronto_download')
             Log.info('ftp pronto para download, servidor {}'.format(servidor.nome))
-            self._gestao_d.executa_download(conteudo['conteudo'])
+            self._gestao_d.executa_download()
 
 
     def _fecha_ftp_servidor(self):
@@ -174,7 +174,7 @@ class ControleApp:
                     servidor = comando['servidor']
                     mensagem = comando['mensagem']
                     self._enviar_mensagem_servidor(servidor, mensagem)
-            time.sleep(60)
+            time.sleep(90)
 
 
 
@@ -188,7 +188,7 @@ class ControleApp:
                 self._gestao_d.remove_finalizado(mensagem['comando']['nome'])
 
 
-            time.sleep(60)
+            time.sleep(5)
 
     def _byte_to_json(self):
 

@@ -2,89 +2,30 @@
     "servidor1":{
         "nome":"servidor1",
         "descricao": "descricao1",
-        "host":"localhost",
+        "host":"10.8.0.1",
         "porta":"5000",
         "ftp":
             {
                 "usuario":"marcelo",
-                "senha":"12345",
-                "host":"localhost",
+                "senha":"cpf04687n",
+                "host":"10.8.0.1",
                 "porta":"5002"
             },
         "backups":[
             {
                 "nome":"backup_1",
                 "backup_auto":"Nao",
-                "path_origem":"/home/marcelo/fonte/backup1",
-                "path_destino":"/home/marcelo/backup/backup1",
+                "path_origem":"/fonte",
+                "path_destino":"/backup",
                 "tipo":"arquivo",
-                "fonte": "hirens-bootcd-15-2-es-en-win.zip",
+                "fonte": "dump_XE_temp.dmp",
                 "periodo":"diario",
                 "dia_semana":"",
-                "hora_execucao":"14:15",
-                "sc_backup":"/home/marcelo/python/nbackup_2/app/sc_backup.sh",
-                "sc_pre_execucao":"/home/marcelo/python/nbackup_2/app/sc_pre.sh",
-                "sc_pos_execucao":"/home/marcelo/python/nbackup_2/app/sc_pos.py"
-            },
-            {
-                "nome":"backup_2",
-                "backup_auto":"Nao",
-                "path_origem":"/home/marcelo/fonte/backup2",
-                "path_destino":"/home/marcelo/backup/backup2",
-                "tipo":"arquivo",
-                "fonte": "CentOS.ova",
-                "periodo":"diario",
-                "dia_semana":"",
-                "hora_execucao":"14:20",
-                "sc_backup":"/home/marcelo/python/nbackup_2/app/sc_backup.sh",
-                "sc_pre_execucao":"/home/marcelo/python/nbackup_2/app/sc_pre.sh",
-                "sc_pos_execucao":"/home/marcelo/python/nbackup_2/app/sc_pos.py"
+                "hora_execucao":"9:00",
+                "sc_backup":"/nbackup/app/sc_backup.sh",
+                "sc_pre_execucao":"/nbackup/app/sc_pre.sh",
+                "sc_pos_execucao":"/nbackup/app/sc_pos.py"
             }
-        ]
-    },
-    "servidor2":{
-        "nome":"servidor2",
-        "descricao":"descricao2",
-        "host":"localhost",
-        "porta":"5000",
-        "ftp":
-            {
-                "usuario":"marcelo",
-                "senha":"12345",
-                "host":"localhost",
-                "porta":"5002"
-            },
-        "backups":[
-            {
-                "nome":"backup_1",
-                "backup_auto":"Nao",
-                "path_origem":"/home/marcelo/fonte/backup1",
-                "path_destino":"/home/marcelo/backup/backup1",
-                "tipo":"arquivo",
-                "fonte": "hirens-bootcd-15-2-es-en-win.zip",
-                "periodo":"diario",
-                "dia_semana":"",
-                "hora_execucao":"11:00",
-                "sc_backup":"/home/marcelo/python/nbackup_2/app/sc_backup.sh",
-                "sc_pre_execucao":"/home/marcelo/python/nbackup_2/app/sc_pre.sh",
-                "sc_pos_execucao":"/home/marcelo/python/nbackup_2/app/sc_pos.py"
-            },
-            {
-                "nome":"backup_2",
-                "backup_auto":"Nao",
-                "path_origem":"/home/marcelo/fonte/backup2",
-                "path_destino":"/home/marcelo/backup/backup2",
-                "tipo":"arquivo",
-                "fonte": "hirens-bootcd-15-2-es-en-win.zip",
-                "periodo":"diario",
-                "dia_semana":"",
-                "hora_execucao":"12:00",
-                "sc_backup":"/home/marcelo/python/nbackup_2/app/sc_backup.sh",
-                "sc_pre_execucao":"/home/marcelo/python/nbackup_2/app/sc_pre.sh",
-                "sc_pos_execucao":"/home/marcelo/python/nbackup_2/app/sc_pos.py"
-            }
-
         ]
     }
-
 }
